@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="add-book-form-container">
+        <h2>Add a Book</h2>
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            <label for="name">{{ form.name.label }}</label>
+            {{ form.name }}
+            <label for="author">{{ form.author.label }}</label>
+            {{ form.author }}
+            <label for="details">{{ form.details.label }}</label>
+            {{ form.details }}
+            <label for="price">{{ form.price.label }}</label>
+            {{ form.price }}
+            <label for="image_link">{{ form.image_link.label }}</label>
+            {{ form.image_link }}
+            <input type="submit" value="Add Book">
+        </form>
+    </div>
+{% endblock %}

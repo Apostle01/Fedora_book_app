@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>Delete a Book</h2>
+    <form method="POST">
+        <label for="search">Search for a book to delete:</label>
+        <input type="text" name="search" placeholder="Enter book name">
+        <input type="submit" value="Search">
+    </form>
+
+    {% if books %}
+        <h3>Search Results:</h3>
+        <ul>
+            {% for book in books %}
+                <li>{{ book.name }} by {{ book.author }} - <a href="{{ url_for('confirm_delete', book_id=book.id) }}">Delete</a></li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endblock %}
