@@ -1,7 +1,7 @@
 from flask import Flask, render_template, redirect, url_for, flash, session, request
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
-from forms import LoginForm, RegistrationForm, BookForm, CommentForm
+from app.forms import LoginForm, RegistrationForm, BookForm, CommentForm
 from models import db, User, Book, Comment
 from config import Config
 
