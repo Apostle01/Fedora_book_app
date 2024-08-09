@@ -1,0 +1,16 @@
+Fedora_book_app/
+├── main.py
+├── forms.py
+├── models.py
+├── config.py
+├── templates/
+│   ├── home.html
+│   ├── login.html
+│   ├── register.html
+│   ├── add_book.html
+│   ├── search.html
+│   ├── delete_book.html
+│   ├── confirm_delete.html
+│   └── book_details.html
+└── static/
+    └── styles.css
