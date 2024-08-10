@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>{{ book.name }}</h2>
+    <p>Author: {{ book.author }}</p>
+    <p>Details: {{ book.details }}</p>
+    <p>Price: ${{ book.price }}</p>
+    <img src="{{ book.image_link }}" alt="{{ book.name }} cover">
+    <p><a href="{{ book.amazon_link }}" target="_blank">Buy on Amazon</a></p>
+    <h3>Comments</h3>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <label for="content">{{ form.content.label }}</label>
+        {{ form.content }}
+        <input type="submit" value="Add Comment">
+    </form>
+    {% if book.comments %}
+        <ul>
+            {% for comment in book.comments %}
+                <li>{{ comment.content }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No comments yet.</p>
+    {% endif %}
+{% endblock %}
