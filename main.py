@@ -10,6 +10,7 @@ app.config.from_object(Config)
 db.init_app(app)
 
 with app.app_context():
+    db.drop_all()
     db.create_all()
 
 @app.route('/')
@@ -112,6 +113,59 @@ def book_details(book_id):
         db.session.commit()
         flash('Comment added successfully', 'success')
     return render_template('book_details.html', book=book, form=form)
+
+# @app.get("/profile/", response_model=schemas.Profile)
+# def read_user_profile(current_user: schemas.User = Depends(get_current_user), db: Session = Depends(get_db)):
+#     profile = crud.get_user_profile(db, user_id=current_user.id)
+#     if profile is None:
+#         raise HTTPException(status_code=404, detail="Profile not found")
+#     return profile
+
+# @app.put("/profile/", response_model=schemas.Profile)
+# def update_user_profile(profile: schemas.ProfileUpdate, db: Session = Depends(get_db), current_user: schemas.User = Depends(get_current_user)):
+#     return crud.update_user_profile(db=db, profile=profile, user_id=current_user.id)
+
+# @app.delete("/profile/", response_model=schemas.Profile)
+# def delete_user_profile(db: Session = Depends(get_db), current_user: schemas.User = Depends(get_current_user)):
+#     return crud.delete_user_profile(db=db, user_id=current_user.id)
+
+@app.route('/profile', methods=['GET', 'POST'])
+def profile():
+    if 'user_id' not in session:
+        flash('Please log in to access your profile.', 'warning')
+        return redirect(url_for('login'))
+
+    user = User.query.get(session['user_id'])
+    if request.method == 'POST':
+        if not user.profile:
+            # Create a profile if it doesn't exist
+            user.profile = Profile(name=request.form['name'], genres_of_interest=request.form['genres_of_interest'])
+        else:
+            user.profile.name = request.form['name']
+            user.profile.email = request.form['email']
+            user.profile.genres_of_interest = request.form['genres_of_interest']
+        db.session.commit()
+        flash('Profile updated successfully!', 'success')
+        return redirect(url_for('profile'))
+    
+    return render_template('profile.html', user=user)
+    
+@app.route('/delete_account', methods=['POST'])
+def delete_account():
+    if 'user_id' not in session:
+        flash('Please log in to delete your account', 'warning')
+        return redirect(url_for('login'))
+
+    user = User.query.get_or_404(session['user_id'])
+    db.session.delete(user)
+    db.session.commit()
+    session.pop('user_id', None)
+    flash('Account deleted successfully', 'success')
+    return redirect(url_for('home'))
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
 
 if __name__ == '__main__':
     app.run(debug=True)

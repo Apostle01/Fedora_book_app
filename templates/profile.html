@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    
+    <h2>User Profile</h2>
+    <form method="POST">
+    <!-- Form to update user profile information -->
+    <form method="POST" action="{{ url_for('profile') }}">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" value="{{ user.name }}" required>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" value="{{ user.email }}" required>
+
+        <label for="genres_of_interest">Genres of Interest:</label>
+        <input type="text" id="genres_of_interest" name="genres_of_interest" value="{{ user.genres_of_interest }}">
+
+        <button type="submit">Save Changes</button>
+    </form>
+
+    <!-- Form to delete user account -->
+    <form method="POST" action="{{ url_for('delete_account') }}">
+        <button type="submit" onclick="return confirm('Are you sure you want to delete your account?');">Delete Account</button>
+    </form>
+
+    <!-- Link to go back to the homepage -->
+    <a href="{{ url_for('home') }}">Back to Home</a>
+
+    {% endblock %}
