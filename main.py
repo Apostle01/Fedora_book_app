@@ -4,10 +4,13 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from forms import LoginForm, RegistrationForm, BookForm, CommentForm
 from models import db, User, Book, Comment
 from config import Config
+import os
 
 app = Flask(__name__)
-app.config.from_object(Config)
-db.init_app(app)
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
 
 with app.app_context():
     db.drop_all()
@@ -149,7 +152,7 @@ def profile():
         return redirect(url_for('profile'))
     
     return render_template('profile.html', user=user)
-    
+
 @app.route('/delete_account', methods=['POST'])
 def delete_account():
     if 'user_id' not in session:
@@ -168,4 +171,5 @@ def page_not_found(e):
     return render_template('404.html'), 404
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(localhosthost=0.0.0.0, 
+        port=5000, debug=True)
