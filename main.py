@@ -7,7 +7,7 @@ from config import Config
 import os
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-default-secret-key')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-strong-secret-key')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
