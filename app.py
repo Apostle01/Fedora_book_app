@@ -3,6 +3,7 @@ from flask import Flask, render_template, redirect, url_for, flash, session, req
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from forms import LoginForm, RegistrationForm, BookForm, CommentForm  # Import forms from forms.py
+from flask_login import LoginManager, UserMixin, login_required, login_user, current_user
 from config import Config
 import logging
 
@@ -177,6 +178,43 @@ def profile(user_id):
     # Logic to fetch user data by user_id
     user = {"name": "John Doe", "email": "john@example.com", "genres_of_interest": "Fiction, Mystery"}
     return render_template('profile.html', user=user)
+
+    # Initialize Flask-Login
+login_manager = LoginManager(app)
+login_manager.login_view = 'login'
+
+# Dummy user model for example
+class User(UserMixin):
+    def __init__(self, id, name, email):
+        self.id = id
+        self.name = name
+        self.email = email
+
+# In-memory user storage
+users = {
+    1: User(1, "Alice", "alice@example.com"),
+    2: User(2, "Bob", "bob@example.com")
+}
+
+@login_manager.user_loader
+def load_user(user_id):
+    return users.get(int(user_id))
+
+@app.route('/login')
+def login():
+    # Example login: automatically log in the first user
+    user = users[1]
+    login_user(user)
+    return redirect(url_for('profile', user_id=user.id))
+
+@app.route('/profile/<int:user_id>')
+@login_required
+def profile(user_id):
+    user = users.get(user_id)
+    if user:
+        return render_template('profile.html', user=user)
+    else:
+        return "User not found", 404
 
 
 @app.errorhandler(404)
