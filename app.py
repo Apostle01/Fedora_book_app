@@ -2,7 +2,7 @@ import os
 from flask import Flask, render_template, redirect, url_for, flash, session, request
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
-from forms import LoginForm, RegistrationForm, BookForm, CommentForm  # Import forms from forms.py
+from forms import LoginForm, RegistrationForm, BookForm, CommentForm
 from flask_login import LoginManager, UserMixin, login_required, login_user, current_user
 from config import Config
 import logging
@@ -12,7 +12,7 @@ app = Flask(__name__)
 app.config.from_object(Config)
 
 # Fetch DATABASE_URL and replace postgres:// with postgresql://
-uri = os.getenv('DATABASE_URL')  # or provide a default value
+uri = os.getenv('DATABASE_URL')
 if uri and uri.startswith("postgres://"):
     uri = uri.replace("postgres://", "postgresql://", 1)
 
@@ -62,7 +62,7 @@ def login():
         try:
             user = User.query.filter_by(username=form.username.data).first()
             if user and check_password_hash(user.password, form.password.data):
-                session['user_id'] = user.id
+                login_user(user)
                 flash('Login successful', 'success')
                 return redirect(url_for('home'))
             else:
@@ -91,7 +91,7 @@ def register():
 
 @app.route('/logout')
 def logout():
-    session.pop('user_id', None)
+    logout_user()
     flash('You have been logged out', 'info')
     return redirect(url_for('home'))
 
@@ -172,15 +172,7 @@ def book_details(book_id):
             flash('An error occurred. Please try again later.', 'danger')
     return render_template('book_details.html', book=book, form=form)
 
-# Custom Profile View Function Using Custom User Fetch
-@app.route('/profile_custom/<int:user_id>', methods=['GET'], endpoint='custom_view_profile')
-def custom_view_profile(user_id):
-    # Logic to fetch user data by user_id
-    user = get_user_by_id(user_id)  # Assume this function fetches the user
-    return render_template('profile.html', user=user)
-
-# Flask-Login Profile View Function
-@app.route('/profile/<int:user_id>')
+@app.route('/profile/<int:user_id>', methods=['GET'])
 @login_required
 def view_profile(user_id):
     user = User.query.get_or_404(user_id)
