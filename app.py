@@ -6,6 +6,7 @@ import logging
 
 # Initialize Flask app and configure it
 app = Flask(__name__)
+app.config.from_object(Config)
 
 # Fetch DATABASE_URL and replace postgres:// with postgresql://
 uri = os.getenv('DATABASE_URL')  # or provide a default value
@@ -15,7 +16,7 @@ if uri and uri.startswith("postgres://"):
 # Update the database URI to use the correct dialect for Heroku
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'postgres://uxsxev1hftq:nQLfLAeCq9x3@ep-gentle-mountain-a23bxz6h-pooler.eu-central-1.aws.neon.tech/alive_tank_path_77653').replace("postgres://", "postgresql://", 1)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'mysecretkey')
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your_secret_key')
 
 # Initialize the database
 db = SQLAlchemy(app)
