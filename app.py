@@ -174,7 +174,7 @@ def book_details(book_id):
     return render_template('book_details.html', book=book, form=form)
 
 @app.route('/profile/<int:user_id>')
-def profile(user_id):
+def update_profile(user_id):
     # Logic to fetch user data by user_id
     user = {"name": "John Doe", "email": "john@example.com", "genres_of_interest": "Fiction, Mystery"}
     return render_template('profile.html', user=user)
@@ -209,7 +209,7 @@ def login_alternative():
 
 @app.route('/profile/<int:user_id>')
 @login_required
-def profile(user_id):
+def view_profile(user_id):
     user = users.get(user_id)
     if user:
         return render_template('profile.html', user=user)
