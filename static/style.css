@@ -10,9 +10,8 @@ body {
     background-color: #f0f9eb; /* Light green background */
     color: #343a40; /* Dark text color */
     display: flex;
-    justify-content: center; /* Center horizontally */
-    align-items: center; /* Center vertically */
-    height: 100vh; /* Full viewport height */
+    flex-direction: column; /* Ensure content stacks vertically */
+    min-height: 100vh; /* Full viewport height */
     margin: 0;
 }
 
@@ -24,6 +23,8 @@ nav {
     width: 100%;
     position: fixed;
     top: 0;
+    left: 0;
+    z-index: 1000; /* Ensure nav is on top */
 }
 
 nav a {
@@ -36,11 +37,17 @@ nav a:hover {
     text-decoration: underline;
 }
 
+/* Main content area */
 .container {
     padding: 2em;
-    margin-top: 100px; /* Increased margin top for space below navigation */
+    margin-top: 70px; /* Space below fixed navigation */
+    flex: 1; /* Flex grow to fill remaining space */
+    width: 100%;
+    max-width: 1200px; /* Limit width for large screens */
+    margin: 70px auto; /* Center content horizontally */
 }
 
+/* Messages and alerts */
 .messages {
     list-style-type: none;
     padding: 0;
@@ -53,8 +60,8 @@ nav a:hover {
     border-left: 5px solid #007BFF;
 }
 
-/* Add Book form container */
-.add-book-form-container {
+/* Form container base styles */
+.form-container {
     display: flex;
     justify-content: center; /* Center horizontally */
     align-items: center; /* Center vertically */
@@ -64,115 +71,96 @@ nav a:hover {
     border: 1px solid #ddd;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 200%; /* Adjusted width for the form container */
-    max-width: 1200px; /* Maximum width for responsiveness */
+    width: 100%; /* Full width by default */
+    max-width: 600px; /* Maximum width for responsiveness */
     margin: 0 auto; /* Center horizontally */
-    margin-left: -50%; /* Resetting left margin */
 }
 
-.add-book-form-container h2 {
+/* Add Book form specific styles */
+.add-book-form-container {
+    margin-top: 2em; /* Additional space on top */
+}
+
+/* Login form specific styles */
+.login-form-container {
+    margin-top: 2em; /* Additional space on top */
+}
+
+/* Headings within form containers */
+.form-container h2 {
     text-align: center;
-    margin-bottom: 4%; /* Percentage-based margin for responsiveness */
+    margin-bottom: 1em;
 }
 
-.add-book-form-container form {
-    width: 90%; /* Form takes 90% width of its container */
+/* Forms within containers */
+.form-container form {
+    width: 100%; /* Full width of the container */
     display: flex;
     flex-direction: column;
-    margin: 0 auto; /* Center the form horizontally */
 }
 
-.add-book-form-container label {
-    margin-bottom: 1%; /* Percentage-based margin for responsiveness */
-    width: 100%; /* Adjusted width to match form width */
-    text-align: left; /* Align labels to the left */
+/* Form labels */
+.form-container label {
+    margin-bottom: 0.5em;
+    width: 100%;
+    text-align: left;
 }
 
-.add-book-form-container input,
-.add-book-form-container textarea {
-    margin-bottom: 3%; /* Percentage-based margin for responsiveness */
-    width: 100%; /* Inputs take 100% width of their container */
-    padding: 3%; /* Percentage-based padding for responsiveness */
+/* Form inputs and textareas */
+.form-container input,
+.form-container textarea {
+    margin-bottom: 1em;
+    width: 100%;
+    padding: 0.75em;
     border: 1px solid #ccc;
     border-radius: 4px;
     box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
-.add-book-form-container textarea {
+.form-container textarea {
     height: 100px;
     resize: none;
 }
 
-.add-book-form-container input[type="submit"] {
-    width: 100%; /* Submit button takes 100% width of its container */
+/* Submit button */
+.form-container input[type="submit"] {
+    width: 100%;
     background-color: #007BFF; /* Blue background */
     color: white;
     border: none;
     cursor: pointer;
-    padding: 4%; /* Increased padding for button */
+    padding: 1em; /* Padding for button */
     border-radius: 4px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.add-book-form-container input[type="submit"]:hover {
+.form-container input[type="submit"]:hover {
     background-color: #0056b3; /* Darker shade on hover */
 }
 
-/* Login form container */
-.login-form-container {
-    display: flex;
-    justify-content: center; /* Center horizontally */
-    align-items: center; /* Center vertically */
-    flex-direction: column;
-    padding: 4%; /* Percentage-based padding for responsiveness */
-    background-color: #e9f4fb; /* Light blue background */
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 200%; /* Adjusted width for the form container */
-    max-width: 1200px; /* Maximum width for responsiveness */
-    margin: 0 auto; /* Center horizontally */
-    margin-left: -50%; /* Resetting left margin */
-}
-
-.login-form-container h2 {
+/* Footer styles */
+footer {
+    background-color: #343a40; /* Dark background color */
+    color: #fff; /* White text color */
     text-align: center;
-    margin-bottom: 4%; /* Percentage-based margin for responsiveness */
+    padding: 1em 0;
+    width: 100%;
+    position: fixed; /* Fixed at the bottom of the page */
+    bottom: 0;
+    left: 0;
 }
 
-.login-form-container form {
-    width: 90%; /* Form takes 90% width of its container */
-    display: flex;
-    flex-direction: column;
-    margin: 0 auto; /* Center the form horizontally */
+footer p {
+    margin: 0;
 }
 
-.login-form-container label {
-    margin-bottom: 1%; /* Percentage-based margin for responsiveness */
-    width: 100%; /* Adjusted width to match form width */
-    text-align: left; /* Align labels to the left */
-}
+/* Additional styling for responsiveness */
+@media (max-width: 768px) {
+    nav {
+        font-size: 0.9em; /* Slightly smaller text for navigation on smaller screens */
+    }
 
-.login-form-container input {
-    margin-bottom: 3%; /* Percentage-based margin for responsiveness */
-    width: 100%; /* Inputs take 100% width of their container */
-    padding: 3%; /* Percentage-based padding for responsiveness */
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-.login-form-container input[type="submit"] {
-    width: 100%; /* Submit button takes 100% width of its container */
-    background-color: #007BFF; /* Blue background */
-    color: white;
-    border: none;
-    cursor: pointer;
-    padding: 4%; /* Increased padding for button */
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.login-form-container input[type="submit"]:hover {
-    background-color: #0056b3; /* Darker shade on hover */
+    .form-container {
+        padding: 3%; /* Adjust padding for smaller screens */
+    }
 }
