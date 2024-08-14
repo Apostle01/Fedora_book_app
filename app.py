@@ -17,7 +17,7 @@ if uri and uri.startswith("postgres://"):
     uri = uri.replace("postgres://", "postgresql://", 1)
 
 # Update the database URI to use the correct dialect for Heroku
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'postgres://uxsxev1hftq:nQLfLAeCq9x3@ep-gentle-mountain-a23bxz6h-pooler.eu-central-1.aws.neon.tech/alive_tank_path_77653').replace("postgres://", "postgresql://", 1)
+app.config['SQLALCHEMY_DATABASE_URI'] = uri
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your_secret_key')
 
@@ -25,7 +25,7 @@ app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your_secret_key')
 db = SQLAlchemy(app)
 
 # Define your models here
-class User(db.Model):
+class User(db.Model, UserMixin):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
@@ -100,7 +100,6 @@ def add_book():
     form = BookForm()
     if form.validate_on_submit():
         try:
-            amazon_link = f"https://www.amazon.com/s?tag=faketag&k={form.title.data.replace(' ', '+')}"
             new_book = Book(
                 title=form.title.data,
                 author=form.author.data
@@ -173,49 +172,27 @@ def book_details(book_id):
             flash('An error occurred. Please try again later.', 'danger')
     return render_template('book_details.html', book=book, form=form)
 
-@app.route('/profile/<int:user_id>', methods=['GET'], endpoint='view_profile')
-def update_profile(user_id):
+# Custom Profile View Function Using Custom User Fetch
+@app.route('/profile_custom/<int:user_id>', methods=['GET'], endpoint='custom_view_profile')
+def custom_view_profile(user_id):
     # Logic to fetch user data by user_id
     user = get_user_by_id(user_id)  # Assume this function fetches the user
     return render_template('profile.html', user=user)
 
-    # Initialize Flask-Login
-login_manager = LoginManager(app)
-login_manager.login_view = 'login'
-
-# Dummy user model for example
-class User(UserMixin):
-    def __init__(self, id, name, email):
-        self.id = id
-        self.name = name
-        self.email = email
-
-# In-memory user storage
-users = {
-    1: User(1, "Alice", "alice@example.com"),
-    2: User(2, "Bob", "bob@example.com")
-}
-
-@login_manager.user_loader
-def load_user(user_id):
-    return users.get(int(user_id))
-
-@app.route('/login_alt', methods=['POST'])
-def login_alternative():
-    # Example login: automatically log in the first user
-    user = users[1]
-    login_user(user)
-    return redirect(url_for('profile', user_id=user.id))
-
+# Flask-Login Profile View Function
 @app.route('/profile/<int:user_id>')
 @login_required
 def view_profile(user_id):
-    user = users.get(user_id)
-    if user:
-        return render_template('profile.html', user=user)
-    else:
-        return "User not found", 404
+    user = User.query.get_or_404(user_id)
+    return render_template('profile.html', user=user)
 
+# Initialize Flask-Login
+login_manager = LoginManager(app)
+login_manager.login_view = 'login'
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 @app.errorhandler(404)
 def not_found_error(error):
