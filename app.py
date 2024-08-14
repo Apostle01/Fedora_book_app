@@ -176,7 +176,7 @@ def book_details(book_id):
 @app.route('/profile/<int:user_id>', methods=['GET'], endpoint='view_profile')
 def update_profile(user_id):
     # Logic to fetch user data by user_id
-    user =get_user_by_id(user_id) {"name": "John Doe", "email": "john@example.com", "genres_of_interest": "Fiction, Mystery"}
+    user = get_user_by_id(user_id)  # Assume this function fetches the user
     return render_template('profile.html', user=user)
 
     # Initialize Flask-Login
