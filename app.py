@@ -200,8 +200,8 @@ users = {
 def load_user(user_id):
     return users.get(int(user_id))
 
-@app.route('/login')
-def login():
+@app.route('/login_alt', methods=['POST'])
+def login_alternative():
     # Example login: automatically log in the first user
     user = users[1]
     login_user(user)
