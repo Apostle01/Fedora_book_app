@@ -2,15 +2,20 @@ import os
 from flask import Flask, render_template, redirect, url_for, flash, session, request
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
-from forms import LoginForm, RegistrationForm, BookForm, CommentForm
-from models import db, User, Book, Comment
+#from forms import LoginForm, RegistrationForm, BookForm, CommentForm
+#from models import db, User, Book, Comment
 from config import Config
 import logging
 
+# Initialize Flask app aand configure it
 app = Flask(__name__)
 app.config.from_object(Config)
-db.init_app(app)
 
+from models import db, User, Book, Comment  # Import models after app configuration
+from forms import LoginForm, RegistrationForm, BookForm, CommentForm
+
+# Initialize the database with the app context
+db.init_app(app)
 with app.app_context():
     db.create_all()
 
@@ -26,25 +31,34 @@ def home():
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
-        if user and check_password_hash(user.password, form.password.data):
-            session['user_id'] = user.id
-            flash('Login successful', 'success')
-            return redirect(url_for('home'))
-        else:
-            flash('Login failed. Check your credentials.', 'danger')
+        try:
+            user = User.query.filter_by(username=form.username.data).first()
+            if user and check_password_hash(user.password, form.password.data):
+                session['user_id'] = user.id
+                flash('Login successful', 'success')
+                return redirect(url_for('home'))
+            else:
+                flash('Login failed. Check your credentials.', 'danger')
+        except Exception as e:
+            logger.error(f'Error during login: {e}')
+            flash('An error occurred. Please try again later.', 'danger')
     return render_template('login.html', form=form)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
-        hashed_password = generate_password_hash(form.password.data, method='pbkdf2:sha256', salt_length=8)
-        new_user = User(username=form.username.data, password=hashed_password)
-        db.session.add(new_user)
-        db.session.commit()
-        flash('Registration successful', 'success')
-        return redirect(url_for('login'))
+        try:
+            hashed_password = generate_password_hash(form.password.data, method='pbkdf2:sha256', salt_length=8)
+            new_user = User(username=form.username.data, password=hashed_password)
+            db.session.add(new_user)
+            db.session.commit()
+            flash('Registration successful', 'success')
+            return redirect(url_for('login'))
+        except Exception as e:
+            db.session.rollback()
+            logger.error(f'Error during registration: {e}')
+            flash('An error occurred. Please try again later.', 'danger')
     return render_template('register.html', form=form)
 
 @app.route('/logout')
@@ -57,19 +71,24 @@ def logout():
 def add_book():
     form = BookForm()
     if form.validate_on_submit():
-        amazon_link = f"https://www.amazon.com/s?tag=faketag&k={form.name.data.replace(' ', '+')}"
-        new_book = Book(
-            name=form.name.data,
-            author=form.author.data,
-            details=form.details.data,
-            price=form.price.data,
-            image_link=form.image_link.data,
-            amazon_link=amazon_link
-        )
-        db.session.add(new_book)
-        db.session.commit()
-        flash('Book added successfully', 'success')
-        return redirect(url_for('search'))
+        try:
+            amazon_link = f"https://www.amazon.com/s?tag=faketag&k={form.name.data.replace(' ', '+')}"
+            new_book = Book(
+                name=form.name.data,
+                author=form.author.data,
+                details=form.details.data,
+                price=form.price.data,
+                image_link=form.image_link.data,
+                amazon_link=amazon_link
+            )
+            db.session.add(new_book)
+            db.session.commit()
+            flash('Book added successfully', 'success')
+            return redirect(url_for('search'))
+        except Exception as e:
+            db.session.rollback()
+            logger.error(f'Error adding book: {e}')
+            flash('An error occurred. Please try again later.', 'danger')
     return render_template('add_book.html', form=form)
 
 @app.route('/search', methods=['GET', 'POST'])
@@ -102,7 +121,6 @@ def confirm_delete(book_id):
     
     if request.method == 'POST':
         try:
-            # Delete associated comments
             Comment.query.filter_by(book_id=book.id).delete()
             db.session.delete(book)
             db.session.commit()
@@ -120,11 +138,25 @@ def book_details(book_id):
     book = Book.query.get_or_404(book_id)
     form = CommentForm()
     if form.validate_on_submit():
-        new_comment = Comment(content=form.content.data, book_id=book.id)
-        db.session.add(new_comment)
-        db.session.commit()
-        flash('Comment added successfully', 'success')
+        try:
+            new_comment = Comment(content=form.content.data, book_id=book.id)
+            db.session.add(new_comment)
+            db.session.commit()
+            flash('Comment added successfully', 'success')
+        except Exception as e:
+            db.session.rollback()
+            logger.error(f'Error adding comment: {e}')
+            flash('An error occurred. Please try again later.', 'danger')
     return render_template('book_details.html', book=book, form=form)
+
+@app.errorhandler(404)
+def not_found_error(error):
+    return render_template('404.html'), 404
+
+@app.errorhandler(500)
+def internal_error(error):
+    db.session.rollback()
+    return render_template('500.html'), 500
 
 if __name__ == "__main__":
     app.run(
