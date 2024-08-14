@@ -172,6 +172,13 @@ def book_details(book_id):
             flash('An error occurred. Please try again later.', 'danger')
     return render_template('book_details.html', book=book, form=form)
 
+@app.route('/profile/<int:user_id>')
+def profile(user_id):
+    # Logic to fetch user data by user_id
+    user = {"name": "John Doe", "email": "john@example.com", "genres_of_interest": "Fiction, Mystery"}
+    return render_template('profile.html', user=user)
+
+
 @app.errorhandler(404)
 def not_found_error(error):
     return render_template('404.html'), 404
