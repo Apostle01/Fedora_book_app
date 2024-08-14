@@ -1,17 +1,16 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, TextAreaField, FloatField, URLField, SubmitField
-from wtforms.validators import DataRequired, Length, EqualTo, URL
-#rom forms import LoginForm, RegistrationForm, BookForm, CommentForm
+from wtforms.validators import DataRequired, Length, Email, EqualTo, URL
 
 class LoginForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired(), Length(min=4, max=150)])
+    username = StringField('Username', validators=[DataRequired(), ])
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Login')
 
 class RegistrationForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired(), Length(min=4, max=150)])
-    password = PasswordField('Password', validators=[DataRequired()])
-    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
+    username = StringField('Username', validators=[DataRequired(), Length(min=4, max=25)])
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=6, max=35)])
+    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password'), Length(min=6, max=35)])
     submit = SubmitField('Register')
 
 class BookForm(FlaskForm):
