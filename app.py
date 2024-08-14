@@ -2,6 +2,7 @@ import os
 from flask import Flask, render_template, redirect, url_for, flash, session, request
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
+from config import Config
 import logging
 
 # Initialize Flask app and configure it
