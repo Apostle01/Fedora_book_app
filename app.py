@@ -33,12 +33,7 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
-    role = db.Column(db.String(50), nullable=False, default='user')  # Add this line
-    books = db.relationship('Book', backref='user', lazy=True)
-    comments = db.relationship('Comment', backref='user', lazy=True)
-
-    def is_admin(self):
-        return self.role == 'admin'
+    
 
 class Book(db.Model):
     __tablename__ = 'books'
