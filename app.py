@@ -5,7 +5,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from forms import LoginForm, RegistrationForm, BookForm, CommentForm
 from flask_login import LoginManager, UserMixin, login_required, login_user, current_user, logout_user
 from config import Config
-from app import db
 import logging
 
 # Initialize Flask app and configure it
