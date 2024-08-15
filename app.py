@@ -181,11 +181,15 @@ def book_details(book_id):
             flash('An error occurred. Please try again later.', 'danger')
     return render_template('book_details.html', book=book, form=form)
 
-@app.route('/profile/<int:user_id>', methods=['GET'])
+@app.route('/profile')
 @login_required
-def view_profile(user_id):
-    user = User.query.get_or_404(user_id)
-    return render_template('profile.html', user=user)
+def view_profile():
+    if current_user.is_authenticated:
+        user_id = current_user.id
+        user = User.query.get_or_404(user_id)
+        return render_template('profile.html', user=user)
+    else:
+        return redirect(url_for('login'))
 
 # Initialize Flask-Login
 login_manager = LoginManager(app)
