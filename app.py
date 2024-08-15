@@ -65,7 +65,8 @@ def login():
             if user and check_password_hash(user.password, form.password.data):
                 login_user(user)
                 flash('Login successful', 'success')
-                return redirect(url_for('home'))
+                # Corrected redirection to the user's profile after login
+                return redirect(url_for('view_profile', user_id=current_user.id))
             else:
                 flash('Login failed. Check your credentials.', 'danger')
         except Exception as e:

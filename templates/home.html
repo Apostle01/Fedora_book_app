@@ -5,7 +5,7 @@
         <h1>Welcome to the Fedora Book App!</h1>
         <p>Discover and Share Your Favorite Books With Others.</p>
         <p>Please Leave a Review</p>
-        <a href="{{ url_for('profile', user_id=current_user.id) }}">Go to your profile</a>
+        <a href="{{ url_for('view_profile', user_id=current_user.id) }}">Profile</a>
         </div>
 {% endblock %}
 
