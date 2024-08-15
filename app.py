@@ -16,6 +16,9 @@ uri = os.getenv('DATABASE_URL')
 if uri and uri.startswith("postgres://"):
     uri = uri.replace("postgres://", "postgresql://", 1)
 
+if not uri:
+    raise RuntimeError('postgresql://postgres:Admin@localhost:5432/books')
+
 # Update the database URI to use the correct dialect for Heroku
 app.config['SQLALCHEMY_DATABASE_URI'] = uri
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
