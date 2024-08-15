@@ -37,33 +37,6 @@ nav a:hover {
     text-decoration: underline;
 }
 
-.navbar-nav .nav-link {
-    color: #000; /* Default link color */
-    padding: 0.5rem 1rem;
-}
-
-.navbar-nav .nav-link:hover {
-    color: #007bff; /* Link hover color */
-}
-
-.navbar-nav .nav-item .nav-link {
-    text-transform: uppercase;
-    font-weight: bold;
-}
-
-.navbar-nav .nav-item .nav-link[href="{{ url_for('register') }}"] {
-    background-color: #f8f9fa;
-    border-radius: 5px;
-    color: #28a745;
-    border: 1px solid #28a745;
-}
-
-.navbar-nav .nav-item .nav-link[href="{{ url_for('register') }}"]:hover {
-    background-color: #28a745;
-    color: #fff;
-}
-
-
 /* Main content area */
 .container {
     padding: 2em;

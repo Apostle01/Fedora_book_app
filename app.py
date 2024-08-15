@@ -164,29 +164,29 @@ def confirm_delete(book_id):
     
     return render_template('confirm_delete.html', book=book)
 
-@app.route('/delete_book/<int:book_id>', methods=['GET', 'POST'])
-@login_required
-def confirm_delete(book_id):
-    book = Book.query.get_or_404(book_id)
+# @app.route('/delete_book/<int:book_id>', methods=['GET', 'POST'])
+# @login_required
+# def confirm_delete(book_id):
+#     book = Book.query.get_or_404(book_id)
     
-    # Check if the current user is an admin or the owner of the book
-    if current_user.is_admin() or book.user_id == current_user.id:
-        if request.method == 'POST':
-            try:
-                # Delete associated comments
-                Comment.query.filter_by(book_id=book.id).delete()
-                db.session.delete(book)
-                db.session.commit()
-                flash(f'Book "{book.name}" deleted successfully', 'success')
-                return redirect(url_for('delete_book'))
-            except Exception as e:
-                db.session.rollback()
-                flash(f'An error occurred while trying to delete the book: {str(e)}', 'danger')
-    else:
-        flash('You do not have permission to delete this book', 'danger')
-        return redirect(url_for('home'))
+#     # Check if the current user is an admin or the owner of the book
+#     if current_user.is_admin() or book.user_id == current_user.id:
+#         if request.method == 'POST':
+#             try:
+#                 # Delete associated comments
+#                 Comment.query.filter_by(book_id=book.id).delete()
+#                 db.session.delete(book)
+#                 db.session.commit()
+#                 flash(f'Book "{book.name}" deleted successfully', 'success')
+#                 return redirect(url_for('delete_book'))
+#             except Exception as e:
+#                 db.session.rollback()
+#                 flash(f'An error occurred while trying to delete the book: {str(e)}', 'danger')
+#     else:
+#         flash('You do not have permission to delete this book', 'danger')
+#         return redirect(url_for('home'))
     
-    return render_template('confirm_delete.html', book=book)
+#     return render_template('confirm_delete.html', book=book)
 
 @app.route('/book/<int:book_id>', methods=['GET', 'POST'])
 def book_details(book_id):
