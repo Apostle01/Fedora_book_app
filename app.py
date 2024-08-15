@@ -1,9 +1,9 @@
 import os
-from flask import Flask, render_template, redirect, url_for, flash, session, request
+from flask import Flask, render_template, redirect, url_for, flash, request
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from forms import LoginForm, RegistrationForm, BookForm, CommentForm
-from flask_login import LoginManager, UserMixin, login_required, login_user, current_user
+from flask_login import LoginManager, UserMixin, login_required, login_user, current_user, logout_user
 from config import Config
 import logging
 
@@ -51,6 +51,7 @@ with app.app_context():
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Routes
 @app.route('/')
 def home():
     return render_template('home.html')
@@ -90,12 +91,14 @@ def register():
     return render_template('register.html', form=form)
 
 @app.route('/logout')
+@login_required
 def logout():
     logout_user()
     flash('You have been logged out', 'info')
     return redirect(url_for('home'))
 
 @app.route('/add_book', methods=['GET', 'POST'])
+@login_required
 def add_book():
     form = BookForm()
     if form.validate_on_submit():
@@ -127,6 +130,7 @@ def search():
     return render_template('search.html', books=books, search_query=search_query)
 
 @app.route('/delete_book', methods=['GET', 'POST'])
+@login_required
 def delete_book():
     search_query = ""
     books = []
@@ -139,6 +143,7 @@ def delete_book():
     return render_template('delete_book.html', books=books, search_query=search_query)
 
 @app.route('/delete_book/<int:book_id>', methods=['GET', 'POST'])
+@login_required
 def confirm_delete(book_id):
     book = Book.query.get_or_404(book_id)
     

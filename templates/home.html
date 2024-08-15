@@ -9,7 +9,8 @@
         </div>
 {% endblock %}
 
-<!-- <li><a href="{{ url_for('home') }}">Home</a></li>
-<li><a href="{{ url_for('login') }}">Login</a></li>
-<li><a href="{{ url_for('register') }}">Register</a></li>
-<li><a href="{{ url_for('search') }}">Search Books</a></li> -->
+{% if current_user.is_authenticated %}
+    <p>Welcome, {{ current_user.username }}!</p>
+{% else %}
+    <p>Welcome, Guest! Please <a href="{{ url_for('login') }}">login</a>.</p>
+{% endif %}
