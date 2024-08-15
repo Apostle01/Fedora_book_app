@@ -5,6 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from forms import LoginForm, RegistrationForm, BookForm, CommentForm
 from flask_login import LoginManager, UserMixin, login_required, login_user, current_user, logout_user
 from config import Config
+from app import db
 import logging
 
 # Initialize Flask app and configure it
@@ -33,6 +34,12 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
+    role = db.Column(db.String(50), nullable=False, default='user')  # Add this line
+    books = db.relationship('Book', backref='user', lazy=True)
+    comments = db.relationship('Comment', backref='user', lazy=True)
+
+    def is_admin(self):
+        return self.role == 'admin'
 
 class Book(db.Model):
     __tablename__ = 'books'
@@ -81,18 +88,16 @@ def login():
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
-        try:
-            hashed_password = generate_password_hash(form.password.data, method='pbkdf2:sha256', salt_length=8)
-            new_user = User(username=form.username.data, password=hashed_password)
-            db.session.add(new_user)
-            db.session.commit()
-            flash('Registration successful', 'success')
-            return redirect(url_for('login'))
-        except Exception as e:
-            db.session.rollback()
-            logger.error(f'Error during registration: {e}')
-            flash('An error occurred. Please try again later.', 'danger')
+        hashed_password = generate_password_hash(
+            form.password.data, method='pbkdf2:sha256', salt_length=8
+        )
+        new_user = Users(username=form.username.data, password=hashed_password, role='user')
+        db.session.add(new_user)
+        db.session.commit()
+        flash('Registration successful', 'success')
+        return redirect(url_for('login'))
     return render_template('register.html', form=form)
+
 
 @app.route('/logout')
 @login_required
@@ -162,6 +167,30 @@ def confirm_delete(book_id):
             db.session.rollback()
             logger.error(f'Error deleting book: {e}')
             flash(f'An error occurred while trying to delete the book: {str(e)}', 'danger')
+    
+    return render_template('confirm_delete.html', book=book)
+
+@app.route('/delete_book/<int:book_id>', methods=['GET', 'POST'])
+@login_required
+def confirm_delete(book_id):
+    book = Book.query.get_or_404(book_id)
+    
+    # Check if the current user is an admin or the owner of the book
+    if current_user.is_admin() or book.user_id == current_user.id:
+        if request.method == 'POST':
+            try:
+                # Delete associated comments
+                Comment.query.filter_by(book_id=book.id).delete()
+                db.session.delete(book)
+                db.session.commit()
+                flash(f'Book "{book.name}" deleted successfully', 'success')
+                return redirect(url_for('delete_book'))
+            except Exception as e:
+                db.session.rollback()
+                flash(f'An error occurred while trying to delete the book: {str(e)}', 'danger')
+    else:
+        flash('You do not have permission to delete this book', 'danger')
+        return redirect(url_for('home'))
     
     return render_template('confirm_delete.html', book=book)
 
