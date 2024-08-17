@@ -1,13 +1,17 @@
+from app import db
+from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
 class User(db.Model):
+    __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(150), nullable=False)
 
 class Book(db.Model):
+    __tablename__ = 'books'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(150), nullable=False)
     author = db.Column(db.String(150), nullable=False)
@@ -17,6 +21,7 @@ class Book(db.Model):
     amazon_link = db.Column(db.String(300), nullable=False)
 
 class Comment(db.Model):
+    __tablename__ = 'comments'
     id = db.Column(db.Integer, primary_key=True)
     book_id = db.Column(db.Integer, db.ForeignKey('book.id'), nullable=False)
     content = db.Column(db.Text, nullable=False)

@@ -1,6 +1,5 @@
 import os
 import logging
-from app import db
 from flask import Flask, render_template, redirect, url_for, flash, request
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -28,6 +27,7 @@ app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your_secret_key')
 
 # Initialize the database
 db = SQLAlchemy(app)
+app = create_app()
 
 
 class User(db.Model, UserMixin):
