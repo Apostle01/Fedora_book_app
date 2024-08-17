@@ -1,70 +1,22 @@
 import os
 import logging
-from flask import Flask, render_template, redirect, url_for, flash, request
-from flask_sqlalchemy import SQLAlchemy
+from flask import render_template, redirect, url_for, flash, request
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import LoginManager, UserMixin, login_required, login_user, \
-    current_user, logout_user
+from flask_login import login_required, login_user, current_user, logout_user
+from create_app import create_app, db, login_manager  # Import the existing db and login_manager instances
 from forms import LoginForm, RegistrationForm, BookForm, CommentForm
-from config import Config
-from create_app import create_app, db # Import the existing db instance
-
 
 # Initialize Flask app using the factory pattern
 app = create_app()
-
-
-
-# Initialize Flask-Login
-login_manager = LoginManager(app)
-login_manager.login_view = 'login'
-
-# Initialize SQLAlchemy database within the app context
-db = SQLAlchemy(app)
-
-class User(db.Model, UserMixin):
-    __tablename__ = 'users'
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(100), unique=True, nullable=False)
-    password = db.Column(db.String(200), nullable=False)
-
-    def is_admin(self):
-        return self.role == 'admin'
-
-
-class Book(db.Model):
-    __tablename__ = 'books'
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(100), nullable=False)
-    author = db.Column(db.String(100), nullable=False)
-
-
-class Comment(db.Model):
-    __tablename__ = 'comments'
-    id = db.Column(db.Integer, primary_key=True)
-    content = db.Column(db.Text, nullable=False)
-    book_id = db.Column(db.Integer, db.ForeignKey('books.id'), nullable=False)
-
-
-# Create all database tables
-with app.app_context():
-    db.create_all()
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Flask-Login user loader
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
-
-
 # Routes
 @app.route('/')
 def home():
     return render_template('home.html')
-
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -83,7 +35,6 @@ def login():
             flash('An error occurred. Please try again later.', 'danger')
     return render_template('login.html', form=form)
 
-
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
@@ -98,14 +49,12 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html', form=form)
 
-
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
     flash('You have been logged out', 'info')
     return redirect(url_for('home'))
-
 
 @app.route('/add_book', methods=['GET', 'POST'])
 @login_required
@@ -127,7 +76,6 @@ def add_book():
             flash('An error occurred. Please try again later.', 'danger')
     return render_template('add_book.html', form=form)
 
-
 @app.route('/search', methods=['GET', 'POST'])
 def search():
     search_query = ""
@@ -139,7 +87,6 @@ def search():
             books = Book.query.filter(Book.title.contains(search_query)).all()
 
     return render_template('search.html', books=books, search_query=search_query)
-
 
 @app.route('/delete_book', methods=['GET', 'POST'])
 @login_required
@@ -153,7 +100,6 @@ def delete_book():
             books = Book.query.filter(Book.title.contains(search_query)).all()
 
     return render_template('delete_book.html', books=books, search_query=search_query)
-
 
 @app.route('/delete_book/<int:book_id>', methods=['GET', 'POST'])
 @login_required
@@ -173,7 +119,6 @@ def confirm_delete(book_id):
             flash(f'An error occurred while trying to delete the book: {str(e)}', 'danger')
     return render_template('confirm_delete.html', book=book)
 
-
 @app.route('/book/<int:book_id>', methods=['GET', 'POST'])
 def book_details(book_id):
     book = Book.query.get_or_404(book_id)
@@ -190,7 +135,6 @@ def book_details(book_id):
             flash('An error occurred. Please try again later.', 'danger')
     return render_template('book_details.html', book=book, form=form)
 
-
 @app.route('/profile')
 @login_required
 def view_profile():
@@ -201,17 +145,14 @@ def view_profile():
     else:
         return redirect(url_for('login'))
 
-
 @app.errorhandler(404)
 def not_found_error(error):
     return render_template('404.html'), 404
-
 
 @app.errorhandler(500)
 def internal_error(error):
     db.session.rollback()
     return render_template('500.html'), 500
-
 
 if __name__ == "__main__":
     app.run(

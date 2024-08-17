@@ -11,7 +11,6 @@ def create_app():
     app.config.from_object(Config)
 
     db.init_app(app) # Initialize the db with the app
-
     login_manager.init_app(app)
     login_manager.init_view = 'login'
 
