@@ -6,14 +6,19 @@
     {{ form.hidden_tag() }}
     <div>
         {{ form.username.label }}<br>
-        {{ form.username(size=32) }}<br>
+        {{ form.username(size=32) }}
+    </div>
+    <div>
         {{ form.password.label }}<br>
-        {{ form.password(size=32) }}<br>
+        {{ form.password(size=32) }}
+    </div>
+    <div>
         {{ form.confirm.label }}<br>
         {{ form.confirm(size=32) }}
     </div>
     <div>
         {{ form.submit() }}
+    </div>
     </div>
 </form>
 {% endblock %}
