@@ -12,9 +12,7 @@ from create_app import create_app
 # Initialize Flask app using the factory pattern
 app = create_app()
 
-# Set up logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+
 
 # Initialize Flask-Login
 login_manager = LoginManager(app)
@@ -50,7 +48,10 @@ class Comment(db.Model):
 # Create all database tables
 with app.app_context():
     db.create_all()
-
+    
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Flask-Login user loader
 @login_manager.user_loader
