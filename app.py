@@ -6,44 +6,28 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_required, login_user, \
     current_user, logout_user
 from forms import LoginForm, RegistrationForm, BookForm, CommentForm
-from create_app import create_app
 from config import Config
+from create_app import create_app
 
-# Initialize Flask app and configure it
-app = Flask(__name__)
-app.config.from_object(Config)
-
-# Fetch DATABASE_URL and replace postgres:// with postgresql://
-uri = os.getenv('DATABASE_URL')
-if uri and uri.startswith("postgres://"):
-    uri = uri.replace("postgres://", "postgresql://", 1)
-
-if not uri:
-    raise RuntimeError('postgresql://postgres:Admin@localhost:5432/books')
-
-# Update the database URI to use the correct dialect for Heroku
-app.config['SQLALCHEMY_DATABASE_URI'] = uri
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your_secret_key')
-
-# Initialize the database
-db = SQLAlchemy(app)
+# Initialize Flask app using the factory pattern
 app = create_app()
 
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Initialize Flask-Login
+login_manager = LoginManager(app)
+login_manager.login_view = 'login'
+
+# Initialize SQLAlchemy database within the app context
+db = SQLAlchemy(app)
 
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
-
-class Users(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(150), nullable=False, unique=True)
-    password = db.Column(db.String(150), nullable=False)
-    role = db.Column(db.String(50), nullable=False, default='user')  # Add this line
-    books = db.relationship('Book', backref='user', lazy=True)
-    comments = db.relationship('Comment', backref='user', lazy=True)
 
     def is_admin(self):
         return self.role == 'admin'
@@ -63,13 +47,15 @@ class Comment(db.Model):
     book_id = db.Column(db.Integer, db.ForeignKey('books.id'), nullable=False)
 
 
-# Initialize the database with the app context
+# Create all database tables
 with app.app_context():
     db.create_all()
 
-# Set up logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+
+# Flask-Login user loader
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 
 # Routes
@@ -150,8 +136,7 @@ def search():
         if search_query:
             books = Book.query.filter(Book.title.contains(search_query)).all()
 
-    return render_template('search.html', books=books, 
-    search_query=search_query)
+    return render_template('search.html', books=books, search_query=search_query)
 
 
 @app.route('/delete_book', methods=['GET', 'POST'])
@@ -165,8 +150,8 @@ def delete_book():
         if search_query:
             books = Book.query.filter(Book.title.contains(search_query)).all()
 
-    return render_template('delete_book.html', books=books,
-    search_query=search_query)
+    return render_template('delete_book.html', books=books, search_query=search_query)
+
 
 @app.route('/delete_book/<int:book_id>', methods=['GET', 'POST'])
 @login_required
@@ -185,6 +170,7 @@ def confirm_delete(book_id):
             logger.error(f'Error deleting book: {e}')
             flash(f'An error occurred while trying to delete the book: {str(e)}', 'danger')
     return render_template('confirm_delete.html', book=book)
+
 
 @app.route('/book/<int:book_id>', methods=['GET', 'POST'])
 def book_details(book_id):
@@ -212,16 +198,6 @@ def view_profile():
         return render_template('profile.html', user=user)
     else:
         return redirect(url_for('login'))
-
-
-# Initialize Flask-Login
-login_manager = LoginManager(app)
-login_manager.login_view = 'login'
-
-
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
 
 
 @app.errorhandler(404)

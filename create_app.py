@@ -1,9 +1,9 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from config import Config
 from flask_login import LoginManager
+from config import Config
+from models import db, Users, Book, Comment
 
-db = SQLAlchemy()
 login_manager = LoginManager()
 
 def create_app():
@@ -12,9 +12,9 @@ def create_app():
 
     db.init_app(app)
     login_manager.init_app(app)
+    login_manager.init_view = 'login'
 
     with app.app_context():
-        from models import User, Book, Comment
         db.create_all()
 
     return app
