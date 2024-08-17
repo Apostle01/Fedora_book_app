@@ -7,7 +7,8 @@ from flask_login import LoginManager, UserMixin, login_required, login_user, \
     current_user, logout_user
 from forms import LoginForm, RegistrationForm, BookForm, CommentForm
 from config import Config
-from create_app import create_app
+from create_app import create_app, db # Import the existing db instance
+
 
 # Initialize Flask app using the factory pattern
 app = create_app()
@@ -48,7 +49,7 @@ class Comment(db.Model):
 # Create all database tables
 with app.app_context():
     db.create_all()
-    
+
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
