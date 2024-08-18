@@ -67,89 +67,52 @@ def logout():
 def add_book():
     form = BookForm()
     if form.validate_on_submit():
-        try:
-            new_book = Book(
-                title=form.title.data,
-                author=form.author.data
-            )
-            db.session.add(new_book)
-            db.session.commit()
-            flash('Book added successfully', 'success')
-            return redirect(url_for('search'))
-        except Exception as e:
-            db.session.rollback()
-            logger.error(f'Error adding book: {e}')
-            flash('An error occurred. Please try again later.', 'danger')
+        new_book = Book(title=form.title.data, author=form.author.data)
+        db.session.add(new_book)
+        db.session.commit()
+        flash('Book added successfully', 'success')
+        return redirect(url_for('search'))
     return render_template('add_book.html', form=form)
 
+
 @app.route('/search', methods=['GET', 'POST'])
+@login_required
 def search():
-    search_query = ""
-    books = []
-
-    if request.method == 'POST':
-        search_query = request.form.get('search', '')
-        if search_query:
-            books = Book.query.filter(Book.title.contains(search_query)).all()
-
+    search_query = request.form.get('search', '')
+    books = Book.query.filter(Book.title.contains(search_query)).all() if search_query else []
     return render_template('search.html', books=books, search_query=search_query)
+
 
 @app.route('/delete_book', methods=['GET', 'POST'])
 @login_required
 def delete_book():
-    search_query = ""
-    books = []
-
-    if request.method == 'POST':
-        search_query = request.form.get('search', '')
-        if search_query:
-            books = Book.query.filter(Book.title.contains(search_query)).all()
-
+    search_query = request.form.get('search', '')
+    books = Book.query.filter(Book.title.contains(search_query)).all() if search_query else []
     return render_template('delete_book.html', books=books, search_query=search_query)
 
-@app.route('/delete_book/<int:book_id>', methods=['GET', 'POST'])
+
+@app.route('/delete_book/<int:book_id>', methods=['POST'])
 @login_required
 def confirm_delete(book_id):
     book = Book.query.get_or_404(book_id)
+    db.session.delete(book)
+    db.session.commit()
+    flash(f'Book "{book.title}" deleted successfully', 'success')
+    return redirect(url_for('delete_book'))
 
-    if request.method == 'POST':
-        try:
-            Comment.query.filter_by(book_id=book.id).delete()
-            db.session.delete(book)
-            db.session.commit()
-            flash(f'Book "{book.title}" deleted successfully', 'success')
-            return redirect(url_for('delete_book'))
-        except Exception as e:
-            db.session.rollback()
-            logger.error(f'Error deleting book: {e}')
-            flash(f'An error occurred while trying to delete the book: {str(e)}', 'danger')
-    return render_template('confirm_delete.html', book=book)
 
 @app.route('/book/<int:book_id>', methods=['GET', 'POST'])
+@login_required
 def book_details(book_id):
     book = Book.query.get_or_404(book_id)
     form = CommentForm()
     if form.validate_on_submit():
-        try:
-            new_comment = Comment(content=form.content.data, book_id=book.id)
-            db.session.add(new_comment)
-            db.session.commit()
-            flash('Comment added successfully', 'success')
-        except Exception as e:
-            db.session.rollback()
-            logger.error(f'Error adding comment: {e}')
-            flash('An error occurred. Please try again later.', 'danger')
+        new_comment = Comment(content=form.content.data, book_id=book.id)
+        db.session.add(new_comment)
+        db.session.commit()
+        flash('Comment added successfully', 'success')
     return render_template('book_details.html', book=book, form=form)
 
-@app.route('/profile')
-@login_required
-def view_profile():
-    if current_user.is_authenticated:
-        user_id = current_user.id
-        user = User.query.get_or_404(user_id)
-        return render_template('profile.html', user=user)
-    else:
-        return redirect(url_for('login'))
 
 @app.errorhandler(404)
 def not_found_error(error):

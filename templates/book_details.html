@@ -12,7 +12,7 @@
         <h3>Add a Comment</h3>
         {{ form.hidden_tag() }}
         <div>
-            <label for="content">{{ form.content.label }}</label>
+            {{ form.content.label }}<br>
             {{ form.content() }}
         </div>
         <div>

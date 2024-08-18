@@ -5,6 +5,8 @@ from config import Config
 
 db = SQLAlchemy() # Create the db instance here, not inside create_app
 login_manager = LoginManager()  # Define login_manager
+login_manager.login_view = 'login'  # Set the view to redirect to when login is required
+
 
 def create_app():
     app = Flask(__name__)
