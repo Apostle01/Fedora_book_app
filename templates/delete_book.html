@@ -12,7 +12,7 @@
         <h3>Search Results:</h3>
         <ul>
             {% for book in books %}
-                <li>{{ book.name }} by {{ book.author }} - <a href="{{ url_for('confirm_delete', book_id=book.id) }}">Delete</a></li>
+                <li>{{ book.name }} by {{ book.author }} - <a href="{{ url_for('confirm_delete', book_id=book.id) }}">Delete Book</a></li>
             {% endfor %}
         </ul>
     {% endif %}
