@@ -7,12 +7,17 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(150), nullable=False)
+    comments = db.relationship('Comment', backref='user', lazy=True)  # Relationship back to comments
+
+    def is_admin(self):
+        return self.role == 'admin'
 
 class Book(db.Model):
     __tablename__ = 'books'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(150), nullable=False)
-    author = db.Column(db.String(150), nullable=False)
+    title = db.Column(db.String(100), nullable=False)
+    author = db.Column(db.String(100), nullable=False)
+    comments = db.relationship('Comment', backref='book', lazy=True)  # Relationship back to comments
     details = db.Column(db.Text, nullable=False)
     price = db.Column(db.Float, nullable=False)
     image_link = db.Column(db.String(300), nullable=False)
@@ -21,7 +26,6 @@ class Book(db.Model):
 class Comment(db.Model):
     __tablename__ = 'comments'
     id = db.Column(db.Integer, primary_key=True)
-    book_id = db.Column(db.Integer, db.ForeignKey('book.id'), nullable=False)
     content = db.Column(db.Text, nullable=False)
-    upvotes = db.Column(db.Integer, default=0)
-    book = db.relationship('Book', backref=db.backref('comments', lazy=True))
+    book_id = db.Column(db.Integer, db.ForeignKey('books.id'), nullable=False)  # Ensure this line is correct
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # If you also want to link to User
