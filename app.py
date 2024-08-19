@@ -5,7 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_required, login_user, current_user, logout_user
 from create_app import create_app, db, login_manager  # Import the existing db and login_manager instances
 from forms import LoginForm, RegistrationForm, BookForm, CommentForm
-from models import User  # Make sure the User model is correctly imported
+from models import User, Book, Comment  # Make sure the User model is correctly imported
 
 # Initialize Flask app using the factory pattern
 app = create_app()
@@ -61,7 +61,7 @@ def login():
 @login_required
 def dashboard():
     return render_template('dashboard.html')
-    
+
 @app.route('/logout')
 @login_required
 def logout():
