@@ -2,11 +2,17 @@
 
 {% block content %}
     <div class="text-center">
-        <h1>Welcome to the Fedora Book App!</h1>
-        <p>Discover and Share Your Favorite Books With Others.</p>
-        <p>Please Leave a Review</p>
-        <a href="{{ url_for('view_profile', user_id=current_user.id) }}">Profile</a>
-        </div>
+        {% if current_user.is_authenticated %}
+            <h1>Welcome back, {{ current_user.username }}!</h1>
+            <p>Discover and Share Your Favorite Books With Others.</p>
+            <p>Leave a Review, Explore Books, or Manage Your Profile.</p>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-primary">Go to Dashboard</a>
+        {% else %}
+            <h1>Welcome to the Fedora Book App!</h1>
+            <p>Discover and Share Your Favorite Books With Others.</p>
+            <p>Please <a href="{{ url_for('login') }}">Log In</a> or <a href="{{ url_for('register') }}">Register</a> to get started.</p>
+        {% endif %}
+    </div>
 {% endblock %}
 
 
