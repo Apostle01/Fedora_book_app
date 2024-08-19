@@ -3,6 +3,7 @@ Fedora_book_app/
 ├── forms.py
 ├── models.py
 ├── config.py
+├── migrations/             # New folder added by Flask-Migrate for tracking migrations
 ├── templates/
 │   ├── home.html
 │   ├── login.html
@@ -14,3 +15,4 @@ Fedora_book_app/
 │   └── book_details.html
 └── static/
     └── styles.css
+
