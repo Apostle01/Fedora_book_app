@@ -24,22 +24,7 @@ def load_user(user_id):
 def home():
     return render_template('home.html')
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    form = LoginForm()
-    if form.validate_on_submit():
-        try:
-            user = User.query.filter_by(username=form.username.data).first()
-            if user and check_password_hash(user.password, form.password.data):
-                login_user(user)
-                flash('Login successful', 'success')
-                return redirect(url_for('view_profile', user_id=current_user.id))
-            else:
-                flash('Login failed. Check your credentials.', 'danger')
-        except Exception as e:
-            logger.error(f'Error during login: {e}')
-            flash('An error occurred. Please try again later.', 'danger')
-    return render_template('login.html', form=form)
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -55,6 +40,28 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html', form=form)
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        try:
+            user = User.query.filter_by(username=form.username.data).first()
+            if user and check_password_hash(user.password, form.password.data):
+                login_user(user)
+                flash('Login successful', 'success')
+                return redirect(url_for('dashboard'))  # Redirect to the dashboard
+            else:
+                flash('Login failed. Check your credentials.', 'danger')
+        except Exception as e:
+            logger.error(f'Error during login: {e}')
+            flash('An error occurred. Please try again later.', 'danger')
+    return render_template('login.html', form=form)
+
+@app.route('/dashboard')
+@login_required
+def dashboard():
+    return render_template('dashboard.html')
+    
 @app.route('/logout')
 @login_required
 def logout():
