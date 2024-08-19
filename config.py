@@ -10,3 +10,4 @@ class Config:
     
     SQLALCHEMY_DATABASE_URI = uri
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+

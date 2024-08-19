@@ -2,6 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_migrate import Migrate  # Import Flask-Migrate
+from app import db
 from config import Config
 
 db = SQLAlchemy() # Create the db instance here, not inside create_app

@@ -1,9 +1,9 @@
 from flask import Flask, render_template, redirect, url_for, flash, request
+from config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager, login_required, login_user, current_user, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from config import Config
 from models import User, Book, Comment
 from forms import LoginForm, RegistrationForm, BookForm, CommentForm
 import os
