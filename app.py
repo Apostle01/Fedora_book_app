@@ -1,6 +1,6 @@
 from create_app import create_app, db
 from flask import render_template, redirect, url_for, flash, request
-from flask_login import login_required, login_user, current_user, logout_user, Login_manager
+from flask_login import login_required, login_user, current_user, logout_user, login_manager
 from models import User, Book, Comment
 from forms import LoginForm, RegistrationForm, BookForm, CommentForm
 from flask_migrate import Migrate
