@@ -1,7 +1,7 @@
 from flask import Flask
-from config import Config  # Ensure this line is correct and config.py exists in the same directory
+from config import Config  # Ensure config.py exists in the same directory
 from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate  # Import Flask-Migrate
+from flask_migrate import Migrate
 from flask_login import LoginManager
 
 # Initialize extensions outside the create_app function
@@ -14,17 +14,13 @@ def create_app():
     app.config.from_object(Config)
 
     # Initialize the extensions with the app
-    db.init_app(app)  # Initialize the db with the app
-    migrate.init_app(app, db)  # Initialize Flask-Migrate with the app and database
-    login_manager.init_app(app)  # Initialize Flask-Login with the app
-    login_manager.login_view = 'login'  # Set the view to redirect to when login is required
+    db.init_app(app)
+    migrate.init_app(app, db)
+    login_manager.init_app(app)
+    login_manager.login_view = 'login'
 
     # Import models here to ensure they are registered with SQLAlchemy
-    from .models import User, Book, Comment
-
-    # Example of registering a blueprint if you have one
-    # from .main import main as main_blueprint
-    # app.register_blueprint(main_blueprint)
+    from models import User, Book, Comment  # Import the models after initializing db
 
     # Ensure tables are created (optional, depending on your app flow)
     with app.app_context():
