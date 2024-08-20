@@ -9,7 +9,7 @@ import logging
 
 # Initialize the Flask application
 app = Flask(__name__)
-app.config.from_object('config.Config'
+app.config.from_object('config.Config')
 
 # Initialize SQLAlchemy
 db = SQLAlchemy(app)
