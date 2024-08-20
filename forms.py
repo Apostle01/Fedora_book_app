@@ -15,6 +15,7 @@ class RegistrationForm(FlaskForm):
 
 class BookForm(FlaskForm):
     name = StringField('Book Name', validators=[DataRequired(), Length(max=150)])
+    title = StringField('Title', validators=[DataRequired(), Length(max=150)])  # New Title Field
     author = StringField('Author Name', validators=[DataRequired(), Length(max=150)])
     details = TextAreaField('Details', validators=[DataRequired()])
     price = FloatField('Price', validators=[DataRequired()])
