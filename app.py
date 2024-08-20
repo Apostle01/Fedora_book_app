@@ -1,10 +1,25 @@
 from create_app import create_app, db
 from flask import render_template, redirect, url_for, flash, request
-from flask_login import login_required, login_user, current_user, logout_user
+from flask_login import login_required, login_user, current_user, logout_user, Login_manager
 from models import User, Book, Comment
 from forms import LoginForm, RegistrationForm, BookForm, CommentForm
+from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
 import logging
+
+# Initialize the Flask application
+app = Flask(__name__)
+app.config.from_object('config.Config'
+
+# Initialize SQLAlchemy
+db = SQLAlchemy(app)
+
+# Initialize Flask-Migrate
+migrate = Migrate(app, db)
+
+# Initialize Flask-Login
+login_manager = LoginManager(app)
+login_manager.login_view = 'login'  # Set the default login view
 
 # Initialize the Flask application
 app = create_app()
@@ -12,11 +27,16 @@ app = create_app()
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+)
 
 # Flask-Login user loader
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+# Import the rest of your routes and models after initializing extensions
+from models import User, Book, Comment
+from routes import *
 
 # Routes
 @app.route('/')
