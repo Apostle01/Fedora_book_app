@@ -1,31 +1,21 @@
+import os
+import logging
 from flask import Flask, render_template, redirect, url_for, flash, request
-from config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager, login_required, login_user, current_user, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from create_app import create_app, db
+from create_app import create_app, db  # Assumes `db` is already initialized in `create_app`
 from models import User, Book, Comment
 from forms import LoginForm, RegistrationForm, BookForm, CommentForm
-import os
-import logging
 
-# Initialize the Flask application
-app = Flask(__name__)
-app.config.from_object(Config)
-
-# Initialize SQLAlchemy
-db = SQLAlchemy(app)
-
-# Initialize Flask-Migrate
-migrate = Migrate(app, db)
+# Initialize the Flask application using the application factory pattern
+app = create_app()
 
 # Initialize Flask-Login
-login_manager = LoginManager(app)
+login_manager = LoginManager()
+login_manager.init_app(app)
 login_manager.login_view = 'login'  # Set the default login view
-
-# Initialize the Flask application
-app = create_app()
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -36,12 +26,7 @@ logger = logging.getLogger(__name__)
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# User loader
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
-
-# (Optional) Request loader
+# Optional: Request loader for token-based authentication
 @login_manager.request_loader
 def load_user_from_request(request):
     token = request.headers.get('Authorization')
@@ -96,7 +81,7 @@ def logout():
 def add_book():
     form = BookForm()
     if form.validate_on_submit():
-        new_book = Book(title=form.title.data, author=form.author.data, details=form.details.data)  # Ensure details is handled
+        new_book = Book(title=form.title.data, author=form.author.data, details=form.details.data)
         db.session.add(new_book)
         db.session.commit()
         flash('Book added successfully', 'success')
