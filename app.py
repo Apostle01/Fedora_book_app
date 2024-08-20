@@ -27,7 +27,6 @@ app = create_app()
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-)
 
 # Flask-Login user loader
 @login_manager.user_loader
