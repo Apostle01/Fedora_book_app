@@ -1,10 +1,13 @@
+from flask import Flask, render_template, redirect, url_for, flash, request
+from config import Config
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+from flask_login import LoginManager, login_required, login_user, current_user, logout_user
+from werkzeug.security import generate_password_hash, check_password_hash
 from create_app import create_app, db
-from flask import render_template, redirect, url_for, flash, request
-from flask_login import login_required, login_user, current_user, logout_user, login_manager
 from models import User, Book, Comment
 from forms import LoginForm, RegistrationForm, BookForm, CommentForm
-from flask_migrate import Migrate
-from werkzeug.security import generate_password_hash, check_password_hash
+import os
 import logging
 
 # Initialize the Flask application
@@ -32,10 +35,6 @@ logger = logging.getLogger(__name__)
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
-
-# Import the rest of your routes and models after initializing extensions
-from models import User, Book, Comment
-from routes import *
 
 # Routes
 @app.route('/')
