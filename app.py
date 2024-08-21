@@ -1,7 +1,7 @@
 import os
 import logging
 from flask import Flask, render_template, redirect, url_for, flash, request
-from flask_login import LoginManager, login_required, login_user, current_user, logout_user, UserMixin
+from flask_login import LoginManager, login_manager, login_required, login_user, current_user, logout_user, UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from create_app import create_app, db  # Import the create_app function and db from create_app.py
 from models import User, Book, Comment
@@ -13,6 +13,12 @@ app = create_app()
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# Initialize the LoginManager
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'  # Optional: set the endpoint for the login view
+
 
 # Flask-Login user loader
 @login_manager.user_loader
