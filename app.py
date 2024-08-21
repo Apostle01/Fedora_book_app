@@ -1,21 +1,14 @@
 import os
 import logging
 from flask import Flask, render_template, redirect, url_for, flash, request
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-from flask_login import LoginManager, login_required, login_user, current_user, logout_user
+from flask_login import login_required, login_user, current_user, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from create_app import create_app, db  # Assumes `db` is already initialized in `create_app`
+from create_app import create_app, db  # Import the create_app function and db from create_app.py
 from models import User, Book, Comment
 from forms import LoginForm, RegistrationForm, BookForm, CommentForm
 
 # Initialize the Flask application using the application factory pattern
 app = create_app()
-
-# Initialize Flask-Login
-login_manager = LoginManager()
-login_manager.init_app(app)
-login_manager.login_view = 'login'  # Set the default login view
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
