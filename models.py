@@ -7,6 +7,7 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(150), nullable=False)
+    role = db.Column(db.String(50), nullable=False, default='user')  # Add this field for role-based access
     comments = db.relationship('Comment', backref='user', lazy=True)  # Relationship back to comments
 
     def is_admin(self):
@@ -27,5 +28,5 @@ class Comment(db.Model):
     __tablename__ = 'comments'
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.Text, nullable=False)
-    book_id = db.Column(db.Integer, db.ForeignKey('books.id'), nullable=False)  # Ensure this line is correct
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # If you also want to link to User
+    book_id = db.Column(db.Integer, db.ForeignKey('books.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
