@@ -1,7 +1,7 @@
 import os
 import logging
 from flask import Flask, render_template, redirect, url_for, flash, request
-from flask_login import login_required, login_user, current_user, logout_user
+from flask_login import LoginManager, login_required, login_user, current_user, logout_user, login_manager
 from werkzeug.security import generate_password_hash, check_password_hash
 from create_app import create_app, db # Import db from create_app.py
 from models import User, Book, Comment
@@ -15,17 +15,19 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Flask-Login user loader
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
+# @login_manager.user_loader
+# def load_user(user_id):
+#     from models import User  # Import here to avoid circular imports
+#     return User.query.get(int(user_id))
+    
 
-# Optional: Request loader for token-based authentication
-@login_manager.request_loader
-def load_user_from_request(request):
-    token = request.headers.get('Authorization')
-    if token:
-        return User.query.filter_by(token=token).first()
-    return None
+# # Optional: Request loader for token-based authentication
+# @login_manager.request_loader
+# def load_user_from_request(request):
+#     token = request.headers.get('Authorization')
+#     if token:
+#         return User.query.filter_by(token=token).first()
+#     return None
 
 # Routes
 @app.route('/')
