@@ -1,6 +1,12 @@
+from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import UserMixin
-from create_app import db  # Import the initialized db instance
+from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user, login_required
+from create_app import db  # Use the db from create_app
+
+app = Flask(__name__)
+app.config.from_object('config.Config')
+# db = SQLAlchemy(app)
+login_manager = LoginManager(app)
 
 # User model
 class User(db.Model, UserMixin):
@@ -13,6 +19,11 @@ class User(db.Model, UserMixin):
 
     def is_admin(self):
         return self.role == 'admin'
+    
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
 
 # Book model
 class Book(db.Model):
@@ -33,3 +44,11 @@ class Comment(db.Model):
     content = db.Column(db.Text, nullable=False)
     book_id = db.Column(db.Integer, db.ForeignKey('books.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+
+@app.route('/home')
+@login_required
+def home():
+    return render_template('home.html')
+
+if __name__ == '__main__':
+    app.run(debug=True)
